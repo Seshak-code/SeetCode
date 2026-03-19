@@ -1,0 +1,212 @@
+:root {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #f3f4f6;
+  background: #0f172a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+.app-shell {
+  min-height: 100vh;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.9);
+  position: sticky;
+  top: 0;
+  backdrop-filter: blur(10px);
+}
+
+.brand {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.tagline,
+.muted-text {
+  color: #94a3b8;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.page-content {
+  padding: 2rem;
+}
+
+.page-stack,
+.sidebar-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.hero-card,
+.panel,
+.problem-card {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 18px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+
+.filters-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.filters-row input,
+.filters-row select,
+.panel__header select {
+  background: #0b1220;
+  border: 1px solid #334155;
+  color: #f8fafc;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+}
+
+.filters-row input {
+  flex: 1;
+  min-width: 240px;
+}
+
+.problem-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.problem-card__header,
+.problem-card__footer,
+.panel__header,
+.problem-meta,
+.problem-layout {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.problem-card__footer {
+  margin-top: 1rem;
+  color: #94a3b8;
+  font-size: 0.95rem;
+  flex-direction: column;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  height: fit-content;
+}
+
+.badge--easy {
+  background: rgba(16, 185, 129, 0.18);
+  color: #6ee7b7;
+}
+
+.badge--medium {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+}
+
+.badge--hard {
+  background: rgba(239, 68, 68, 0.18);
+  color: #fca5a5;
+}
+
+.problem-layout {
+  align-items: start;
+}
+
+.panel--content {
+  flex: 1.2;
+}
+
+.sidebar-stack {
+  flex: 1;
+}
+
+.code-block {
+  overflow-x: auto;
+  background: #020617;
+  border-radius: 14px;
+  padding: 1rem;
+  border: 1px solid #1e293b;
+}
+
+.content-section {
+  margin-top: 1.5rem;
+}
+
+.examples-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.example-card {
+  background: #020617;
+  border-radius: 14px;
+  padding: 1rem;
+  border: 1px solid #1e293b;
+}
+
+.loading-state,
+.empty-state {
+  padding: 2rem;
+  text-align: center;
+  color: #cbd5e1;
+}
+
+.back-link {
+  color: #93c5fd;
+}
+
+@media (max-width: 900px) {
+  .problem-layout,
+  .topbar,
+  .problem-card__header,
+  .panel__header,
+  .problem-meta {
+    flex-direction: column;
+  }
+
+  .page-content {
+    padding: 1rem;
+  }
+}

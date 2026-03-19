@@ -1,0 +1,20 @@
+{
+  "name": "seetcode",
+  "private": true,
+  "version": "0.1.0",
+  "description": "A basic LeetCode-style coding practice platform built with React and Node.js.",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace client & npm run dev --workspace server",
+    "dev:client": "npm run dev --workspace client",
+    "dev:server": "npm run dev --workspace server",
+    "build": "npm run build --workspace client",
+    "start": "npm run start --workspace server"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
