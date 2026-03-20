@@ -19,3 +19,22 @@ pnpm-debug.log*
 
 # Backend temp execution files
 server/docker_tmp/
+
+# SQLite database (runtime data — not source)
+server/database.sqlite
+server/database.sqlite-shm
+server/database.sqlite-wal
+
+# Generated one-off utility / migration scripts
+server/validateSandbox.js
+server/fixWrappers.js
+server/extractAndPatch.js
+server/finalCure.js
+server/forceFix.js
+server/raiseRecursionLimit.js
+server/regenCpp.js
+server/restoreFullConstraints.js
+server/fixNumIslandsPy.js
+
+# Dev logs
+dev.log

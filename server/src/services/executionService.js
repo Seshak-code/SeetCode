@@ -128,6 +128,25 @@ export async function executeCodeInDocker(code, language, slug, isRunMode = fals
              feedback.push('Good job using BFS! If your execution time is slow, make sure you are Updating Distance Before Adding to Queue. Updating the distance when a cell is popped instead of when it is discovered causes cells to be added to the queue multiple times!');
           }
        }
+    } else if (slug === 'number-of-islands') {
+       const usesQueue = code.includes('queue') || code.includes('Queue');
+       const usesStack = code.includes('stack') || code.includes('Stack');
+       const isRecursive = code.match(/dfs\s*\(/) || code.match(/solve\s*\(/) || code.match(/backtrack\s*\(/) || (code.match(/numIslands\s*\(/) && code.split('numIslands').length > 2);
+       const modifiesGrid = code.includes('grid[') && code.includes("='0'");
+       const usesVisited = code.includes('visited') || code.includes('vector<vector<bool>>');
+       const usesUnionFind = code.includes('parent') && (code.includes('find(') || code.includes('union(') || code.includes('union_set(') || code.includes('UnionFind'));
+
+       if (usesUnionFind) {
+          feedback.push('Interesting approach! You are using Disjoint Set Union (Union-Find). This is a great way to solve the problem and easily scale to dynamically adding islands, although it has a slightly higher overhead than a simple BFS/DFS sweep.');
+       } else if ((usesQueue || usesStack || isRecursive) && usesVisited) {
+          feedback.push('Optimization Potential: You are using an external `visited` matrix which takes O(M*N) extra space. Can you optimize this to O(1) auxiliary space (excluding call stack) by modifying the input grid directly to sink the islands (e.g., `grid[i][j] = \\\'0\\\'`) as you visit them?');
+       } else if ((usesQueue || usesStack || isRecursive) && modifiesGrid) {
+          feedback.push('Exceptional! You achieved optimal O(1) auxiliary space capability by modifying the grid in-place ("sinking" the islands) instead of using an O(M*N) visited matrix.');
+       }
+       
+       if (isRecursive && !usesVisited && !modifiesGrid && !isSuccess) {
+          feedback.push('Logic Pitfall: Infinite Recursion! You are likely not marking cells as visited or sinking them to \\\'0\\\', causing your DFS to ping-pong back and forth between two adjacent \\\'1\\\' cells until a Stack Overflow occurs.');
+       }
     }
     
     return {
