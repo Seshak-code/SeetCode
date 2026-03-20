@@ -26,11 +26,32 @@ export async function getProblemBySlug(request, response) {
 
 export async function submitProblem(request, response) {
   const { slug } = request.params;
-  const { code, language, isRunMode } = request.body;
+  const { code, language, isRunMode, userId } = request.body;
   
   const { executeCodeInDocker } = await import('../services/executionService.js');
   const result = await executeCodeInDocker(code, language, slug, isRunMode);
+  
+  if (!isRunMode && userId) {
+    const { createSubmission } = await import('../services/databaseService.js');
+    await createSubmission(userId, slug, language, code, result.status, result.executionTimeMs, result.feedback);
+  }
+  
   return response.json(result);
+}
+
+export async function getProblemSubmissions(request, response) {
+  try {
+    const { slug } = request.params;
+    const { userId } = request.query;
+    if (!userId) return response.status(400).json({ error: 'Missing userId parameter' });
+    
+    const { getSubmissionsBySlug } = await import('../services/databaseService.js');
+    const runs = await getSubmissionsBySlug(userId, slug);
+    return response.json(runs);
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ error: 'Failed to fetch submissions' });
+  }
 }
 
 export async function createProblemAdmin(request, response) {

@@ -9,6 +9,9 @@ const __dirname = path.dirname(__filename);
 const dbPath = path.resolve(__dirname, '../../database.sqlite');
 const db = new sqlite3.Database(dbPath);
 
+// Enable WAL mode for concurrent Read/Write capabilities without locking issues
+db.run('PRAGMA journal_mode = WAL;');
+
 // Promisify sqlite3 methods
 export const dbRun = promisify(db.run.bind(db));
 export const dbAll = promisify(db.all.bind(db));
@@ -65,10 +68,39 @@ export async function createProblem(problemData, testWrapperData) {
   }
 }
 
+export async function getUser(username, password) {
+  // In a real app we'd use bcrypt, but we'll fulfill the raw req "password" locally
+  return await dbGet('SELECT * FROM users WHERE username = ? AND password = ?', [username, password]);
+}
+
+export async function createSubmission(userId, slug, language, code, status, timeMs, feedback) {
+  // Guard against massive code string explosions
+  const slicedCode = code.slice(0, 15000); 
+  await dbRun(
+    `INSERT INTO submissions (user_id, problem_slug, language, code, status, execution_time_ms, feedback)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [userId, slug, language, slicedCode, status, timeMs, JSON.stringify(feedback)]
+  );
+}
+
+export async function getSubmissionsBySlug(userId, slug) {
+  const runs = await dbAll(
+    'SELECT * FROM submissions WHERE user_id = ? AND problem_slug = ? ORDER BY created_at DESC', 
+    [userId, slug]
+  );
+  return runs.map(run => ({
+    ...run,
+    feedback: JSON.parse(run.feedback || '[]')
+  }));
+}
+
 export default {
   getAllProblems,
   getProblemBySlug,
   getProblemTestWrapper,
   createProblem,
+  getUser,
+  createSubmission,
+  getSubmissionsBySlug,
   dbRun
 };

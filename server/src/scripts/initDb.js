@@ -32,8 +32,35 @@ async function init() {
   console.log('Re-initializing SQLite Database for full test suite...');
 
   // Wipe old tables to apply the fresh constraints
+  await dbRun(`DROP TABLE IF EXISTS submissions`);
+  await dbRun(`DROP TABLE IF EXISTS users`);
   await dbRun(`DROP TABLE IF EXISTS problem_tests`);
   await dbRun(`DROP TABLE IF EXISTS problems`);
+
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT UNIQUE,
+      password TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS submissions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER,
+      problem_slug TEXT,
+      language TEXT,
+      code TEXT,
+      status TEXT,
+      execution_time_ms REAL,
+      feedback TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY(problem_slug) REFERENCES problems(slug) ON DELETE CASCADE
+    )
+  `);
 
   await dbRun(`
     CREATE TABLE IF NOT EXISTS problems (
@@ -368,7 +395,11 @@ You are given an <code>m x n</code> grid initialized with three possible values:
   await createProblem(twoSumData, { test_wrappers: { cpp: mainCppTemplate } });
   await createProblem(wallsAndGatesData, { test_wrappers: { cpp: wallsAndGatesCppTemplate } });
   
+  // Seed the requested user account
+  await dbRun(`INSERT OR IGNORE INTO users (username, password) VALUES ('username', 'password')`);
+  
   console.log('Seeded problem "two-sum" & "walls-and-gates" with 100 massive testing blocks securely embedded into the Docker payload.');
+  console.log('Seeded base test user (username/password).');
   console.log('Initialization complete.');
 }
 
