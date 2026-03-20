@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 function ExecutionResultsPanel({ result, isSubmitting }) {
+  const [expandedTests, setExpandedTests] = useState(false);
+  const [selectedCase, setSelectedCase] = useState(0);
   if (isSubmitting) {
     return (
       <section className="panel results-panel" style={{ flexGrow: 1, minHeight: '300px' }}>
@@ -31,10 +33,94 @@ function ExecutionResultsPanel({ result, isSubmitting }) {
       <div className="results-content" style={{ padding: '15px', display: 'flex', flexDirection: 'column', gap: '20px', overflowY: 'auto' }}>
         <div style={{ paddingBottom: '10px', borderBottom: '1px solid #30363d' }}>
           <h3 style={{ color: statusColor, margin: '0 0 8px 0', fontSize: '1.4rem', fontWeight: 'bold' }}>{result.status}</h3>
-          {result.executionTimeMs > 0 && (
+          {Number(result.executionTimeMs) > 0 && (
              <p style={{ margin: 0, fontWeight: 'bold', color: '#c9d1d9', fontSize: '0.9rem' }}>
                 Runtime: <span style={{ color: '#fff' }}>{result.executionTimeMs} ms</span>
              </p>
+          )}
+          
+          {result.isRunMode ? (
+            <div className="run-mode-results" style={{ marginTop: '5px' }}>
+               <div style={{ display: 'flex', gap: '8px', marginBottom: '15px' }}>
+                 {result.testDetails?.map((test, idx) => (
+                   <button 
+                     key={test.id}
+                     onClick={() => setSelectedCase(idx)}
+                     style={{ 
+                       padding: '6px 14px', 
+                       borderRadius: '8px', 
+                       background: selectedCase === idx ? 'rgba(255,255,255,0.15)' : 'transparent',
+                       border: 'none',
+                       color: '#fff',
+                       cursor: 'pointer',
+                       fontWeight: '600',
+                       display: 'flex',
+                       alignItems: 'center',
+                       gap: '8px',
+                       transition: 'all 0.2s',
+                       fontSize: '0.95rem'
+                     }}
+                   >
+                     <span style={{ color: test.status === 'PASS' ? '#2ea44f' : '#cb2431', fontSize: '1.2rem', lineHeight: '1' }}>{test.status === 'PASS' ? '☑' : '☒'}</span> Case {idx + 1}
+                   </button>
+                 ))}
+               </div>
+               
+               {result.testDetails && result.testDetails[selectedCase] && (
+                 <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                   {result.testDetails[selectedCase].input && (
+                     <div>
+                       <span style={{ fontSize: '0.9rem', color: '#c9d1d9', fontWeight: 'bold' }}>Input</span>
+                       <pre style={{ margin: '8px 0 0 0', padding: '12px 16px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', fontFamily: 'monospace', color: '#fff', whiteSpace: 'pre-wrap', fontSize: '14px' }}>{result.testDetails[selectedCase].input}</pre>
+                     </div>
+                   )}
+                   {result.testDetails[selectedCase].output && (
+                     <div>
+                       <span style={{ fontSize: '0.9rem', color: '#c9d1d9', fontWeight: 'bold' }}>Output</span>
+                       <pre style={{ margin: '8px 0 0 0', padding: '12px 16px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', fontFamily: 'monospace', color: result.testDetails[selectedCase].status === 'PASS' ? '#2ea44f' : '#cb2431', whiteSpace: 'pre-wrap', fontSize: '14px' }}>{result.testDetails[selectedCase].output}</pre>
+                     </div>
+                   )}
+                   {result.testDetails[selectedCase].expected && (
+                     <div>
+                       <span style={{ fontSize: '0.9rem', color: '#c9d1d9', fontWeight: 'bold' }}>Expected</span>
+                       <pre style={{ margin: '8px 0 0 0', padding: '12px 16px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', fontFamily: 'monospace', color: '#fff', whiteSpace: 'pre-wrap', fontSize: '14px' }}>{result.testDetails[selectedCase].expected}</pre>
+                     </div>
+                   )}
+                   {result.testDetails[selectedCase].message && !result.testDetails[selectedCase].input && (
+                     <pre style={{ margin: '8px 0 0 0', padding: '12px 16px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', fontFamily: 'monospace', color: result.testDetails[selectedCase].status === 'PASS' ? '#2ea44f' : '#cb2431', whiteSpace: 'pre-wrap', fontSize: '14px' }}>{result.testDetails[selectedCase].message}</pre>
+                   )}
+                 </div>
+               )}
+            </div>
+          ) : (
+            result.total > 0 && (
+              <div style={{ marginTop: '15px' }}>
+                <p style={{ margin: '0 0 10px 0', fontWeight: 'bold', fontSize: '1.1rem', color: result.passed === result.total ? '#2ea44f' : '#cb2431' }}>
+                  Passed {result.passed} / {result.total} Test Cases
+                </p>
+                <button 
+                  onClick={() => setExpandedTests(!expandedTests)} 
+                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid #30363d', color: '#c9d1d9', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', width: '100%', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'background 0.2s', fontWeight: 'bold' }}
+                  onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+                  onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                >
+                  <span>{expandedTests ? 'Hide Detailed Test Case Results' : 'View Detailed Test Case Results'}</span>
+                  <span style={{ transition: 'transform 0.2s', transform: expandedTests ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+                </button>
+                
+                {expandedTests && (
+                  <div style={{ marginTop: '10px', maxHeight: '350px', overflowY: 'auto', background: '#0d1117', borderRadius: '6px', border: '1px solid #30363d' }}>
+                    {result.testDetails?.map(test => (
+                      <div key={test.id} style={{ display: 'flex', borderBottom: '1px solid #21262d', padding: '10px', alignItems: 'center' }}>
+                        <span style={{ width: '50px', fontWeight: 'bold', color: '#8b949e', fontSize: '0.9rem' }}>#{test.id}</span>
+                        <span style={{ width: '60px', fontWeight: 'bold', color: test.status === 'PASS' ? '#2ea44f' : '#cb2431', fontSize: '0.9rem' }}>{test.status}</span>
+                        <span style={{ flex: 1, fontFamily: 'monospace', fontSize: '0.85rem', color: '#c9d1d9' }}>{test.input ? `Input: ${test.input.substring(0, 30)}... | Output: ${test.output}` : test.message}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
           )}
         </div>
 
@@ -48,15 +134,6 @@ function ExecutionResultsPanel({ result, isSubmitting }) {
                 <li key={i}>{fb}</li>
               ))}
             </ul>
-          </div>
-        )}
-
-        {result.stdout && (
-          <div className="stdout-output">
-            <h4 style={{ margin: '0 0 8px 0', color: '#8b949e', fontSize: '0.9rem', textTransform: 'uppercase' }}>Standard Output</h4>
-            <pre style={{ background: '#161b22', border: '1px solid #30363d', padding: '12px', borderRadius: '6px', overflowX: 'auto', margin: 0, color: '#e6edf3', fontSize: '13px', fontFamily: 'monospace' }}>
-              {result.stdout}
-            </pre>
           </div>
         )}
 

@@ -55,7 +55,7 @@ function AdminUploadPage() {
     };
 
     try {
-      const res = await fetch('http://localhost:5000/api/problems/admin/upload', {
+      const res = await fetch('http://localhost:5005/api/problems/admin/upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

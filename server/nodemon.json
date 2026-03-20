@@ -1,0 +1,6 @@
+{
+  "ignore": [
+    "docker_tmp/*",
+    "test.js"
+  ]
+}

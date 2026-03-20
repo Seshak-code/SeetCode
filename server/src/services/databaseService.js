@@ -44,7 +44,7 @@ export async function getProblemTestWrapper(slug) {
 
 export async function createProblem(problemData, testWrapperData) {
   const { slug, title, difficulty, summary, description, acceptanceRate, topics, constraints, examples, starterCode } = problemData;
-  const { mainCppTemplate } = testWrapperData;
+  const { test_wrappers } = testWrapperData;
 
   await dbRun(
     `INSERT OR REPLACE INTO problems 
@@ -57,10 +57,10 @@ export async function createProblem(problemData, testWrapperData) {
     ]
   );
   
-  if (mainCppTemplate) {
+  if (test_wrappers) {
     await dbRun(
-      `INSERT OR REPLACE INTO problem_tests (problem_slug, mainCppTemplate) VALUES (?, ?)`,
-      [slug, mainCppTemplate]
+      `INSERT OR REPLACE INTO problem_tests (problem_slug, test_wrappers) VALUES (?, ?)`,
+      [slug, JSON.stringify(test_wrappers)]
     );
   }
 }

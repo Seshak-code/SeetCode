@@ -1,4 +1,4 @@
-import { executeCppInDocker } from '../services/executionService.js';
+import { executeCodeInDocker } from '../services/executionService.js';
 import { getAllProblems, getProblemBySlug as getProblemFromDb } from '../services/databaseService.js';
 
 export async function getProblems(_request, response) {
@@ -26,13 +26,10 @@ export async function getProblemBySlug(request, response) {
 
 export async function submitProblem(request, response) {
   const { slug } = request.params;
-  const { code, language } = request.body;
+  const { code, language, isRunMode } = request.body;
   
-  if (language !== 'cpp') {
-     return response.status(400).json({ status: 'Error', stderr: 'Only C++ code is supported currently.' });
-  }
-  
-  const result = await executeCppInDocker(code, slug);
+  const { executeCodeInDocker } = await import('../services/executionService.js');
+  const result = await executeCodeInDocker(code, language, slug, isRunMode);
   return response.json(result);
 }
 
