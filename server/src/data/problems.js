@@ -18,7 +18,8 @@ export const problems = [
       }
     ],
     starterCode: {
-      javascript: `function twoSum(nums, target) {\n  const seen = new Map();\n\n  for (let index = 0; index < nums.length; index += 1) {\n    const value = nums[index];\n    const complement = target - value;\n\n    if (seen.has(complement)) {\n      return [seen.get(complement), index];\n    }\n\n    seen.set(value, index);\n  }\n\n  return [];\n}`
+      javascript: `function twoSum(nums, target) {\n  const seen = new Map();\n\n  for (let index = 0; index < nums.length; index += 1) {\n    const value = nums[index];\n    const complement = target - value;\n\n    if (seen.has(complement)) {\n      return [seen.get(complement), index];\n    }\n\n    seen.set(value, index);\n  }\n\n  return [];\n}`,
+      cpp: `#include <vector>\n#include <unordered_map>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> twoSum(vector<int>& nums, int target) {\n        \n    }\n};`
     }
   },
   {
@@ -39,7 +40,8 @@ export const problems = [
       }
     ],
     starterCode: {
-      javascript: `function isValid(s) {\n  const stack = [];\n  const pairs = { ')': '(', ']': '[', '}': '{' };\n\n  for (const char of s) {\n    if (!pairs[char]) {\n      stack.push(char);\n      continue;\n    }\n\n    if (stack.pop() !== pairs[char]) {\n      return false;\n    }\n  }\n\n  return stack.length === 0;\n}`
+      javascript: `function isValid(s) {\n  const stack = [];\n  const pairs = { ')': '(', ']': '[', '}': '{' };\n\n  for (const char of s) {\n    if (!pairs[char]) {\n      stack.push(char);\n      continue;\n    }\n\n    if (stack.pop() !== pairs[char]) {\n      return false;\n    }\n  }\n\n  return stack.length === 0;\n}`,
+      cpp: `#include <string>\n#include <stack>\nusing namespace std;\n\nclass Solution {\npublic:\n    bool isValid(string s) {\n        \n    }\n};`
     }
   },
   {
@@ -61,7 +63,8 @@ export const problems = [
       }
     ],
     starterCode: {
-      javascript: `function lengthOfLongestSubstring(s) {\n  let left = 0;\n  let maxLength = 0;\n  const lastSeen = new Map();\n\n  for (let right = 0; right < s.length; right += 1) {\n    const char = s[right];\n\n    if (lastSeen.has(char) && lastSeen.get(char) >= left) {\n      left = lastSeen.get(char) + 1;\n    }\n\n    lastSeen.set(char, right);\n    maxLength = Math.max(maxLength, right - left + 1);\n  }\n\n  return maxLength;\n}`
+      javascript: `function lengthOfLongestSubstring(s) {\n  let left = 0;\n  let maxLength = 0;\n  const lastSeen = new Map();\n\n  for (let right = 0; right < s.length; right += 1) {\n    const char = s[right];\n\n    if (lastSeen.has(char) && lastSeen.get(char) >= left) {\n      left = lastSeen.get(char) + 1;\n    }\n\n    lastSeen.set(char, right);\n    maxLength = Math.max(maxLength, right - left + 1);\n  }\n\n  return maxLength;\n}`,
+      cpp: `#include <string>\n#include <unordered_map>\nusing namespace std;\n\nclass Solution {\npublic:\n    int lengthOfLongestSubstring(string s) {\n        \n    }\n};`
     }
   }
 ];

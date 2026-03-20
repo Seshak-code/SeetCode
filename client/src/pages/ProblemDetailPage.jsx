@@ -2,12 +2,15 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import CodePanel from '../components/CodePanel';
 import TestCasesPanel from '../components/TestCasesPanel';
+import ExecutionResultsPanel from '../components/ExecutionResultsPanel';
 import { fetchProblemBySlug } from '../services/problemService';
 
 function ProblemDetailPage() {
   const { slug } = useParams();
   const [problem, setProblem] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [executionResult, setExecutionResult] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     async function loadProblem() {
@@ -21,6 +24,27 @@ function ProblemDetailPage() {
 
     loadProblem();
   }, [slug]);
+
+  const handleCodeSubmit = async (code, language) => {
+    setIsSubmitting(true);
+    setExecutionResult(null);
+    try {
+      const res = await fetch(`http://localhost:5000/api/problems/${problem.slug}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ code, language })
+      });
+      const result = await res.json();
+      setExecutionResult(result);
+    } catch (err) {
+      console.error(err);
+      setExecutionResult({ status: 'Error', stderr: 'Failed to connect to backend execution engine. Ensure Docker is running!' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (loading) {
     return <div className="loading-state">Loading challenge...</div>;
@@ -63,8 +87,15 @@ function ProblemDetailPage() {
       </div>
 
       <div className="sidebar-stack">
-        <CodePanel starterCode={problem.starterCode.javascript} />
-        <TestCasesPanel examples={problem.examples} />
+        <CodePanel 
+          starterCode={problem.starterCode.cpp || problem.starterCode.javascript}
+          onSubmit={handleCodeSubmit}
+        />
+        {executionResult || isSubmitting ? (
+          <ExecutionResultsPanel result={executionResult} isSubmitting={isSubmitting} />
+        ) : (
+          <TestCasesPanel examples={problem.examples} />
+        )}
       </div>
     </section>
   );
