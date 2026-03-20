@@ -1,6 +1,9 @@
 {
   "ignore": [
-    "docker_tmp/*",
-    "test.js"
+    "docker_tmp/**",
+    "*.log",
+    "*.sqlite",
+    "*.sqlite-shm",
+    "*.sqlite-wal"
   ]
 }

@@ -4,7 +4,7 @@ import CodePanel from '../components/CodePanel';
 import TestCasesPanel from '../components/TestCasesPanel';
 import ExecutionResultsPanel from '../components/ExecutionResultsPanel';
 import SubmissionsPanel from '../components/SubmissionsPanel';
-import { fetchProblemBySlug } from '../services/problemService';
+import { fetchProblemBySlug, submitCode, fetchSubmissions } from '../services/problemService';
 import { useAuth } from '../context/AuthContext';
 
 function ProblemDetailPage() {
@@ -32,11 +32,8 @@ function ProblemDetailPage() {
   const loadSubmissions = async () => {
     if (!user) return;
     try {
-      const res = await fetch(`http://localhost:5005/api/problems/${slug}/submissions?userId=${user.id}`);
-      if (res.ok) {
-        const data = await res.json();
-        setSubmissions(data);
-      }
+      const data = await fetchSubmissions(slug, user.id);
+      setSubmissions(data);
     } catch (err) {
       console.error('Failed to load submissions', err);
     }
@@ -50,14 +47,7 @@ function ProblemDetailPage() {
     setIsSubmitting(true);
     setExecutionResult(null);
     try {
-      const res = await fetch(`http://localhost:5005/api/problems/${problem.slug}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ code, language, isRunMode, userId: user?.id })
-      });
-      const result = await res.json();
+      const result = await submitCode(slug, code, language, isRunMode, user?.id);
       setExecutionResult(result);
       if (!isRunMode && user) {
         loadSubmissions();
@@ -65,15 +55,16 @@ function ProblemDetailPage() {
       }
     } catch (err) {
       console.error(err);
-      setExecutionResult({ status: 'Error', stderr: 'Failed to connect to backend execution engine. Ensure Docker is running!' });
+      setExecutionResult({
+        status: 'Error',
+        stderr: 'Failed to connect to the execution engine. Ensure Docker is running!',
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (loading) {
-    return <div className="loading-state">Loading challenge...</div>;
-  }
+  if (loading) return <div className="loading-state">Loading challenge...</div>;
 
   if (!problem) {
     return (
@@ -83,6 +74,16 @@ function ProblemDetailPage() {
       </div>
     );
   }
+
+  const tabStyle = (tab) => ({
+    fontWeight: 'bold',
+    background: 'none',
+    border: 'none',
+    color: activeTab === tab ? '#fff' : '#8b949e',
+    borderBottom: activeTab === tab ? '2px solid #8b5cf6' : '2px solid transparent',
+    cursor: 'pointer',
+    paddingBottom: '0.8rem',
+  });
 
   return (
     <section className="problem-layout">
@@ -97,18 +98,8 @@ function ProblemDetailPage() {
         <p className="muted-text">Acceptance: {problem.acceptanceRate}</p>
 
         <div style={{ display: 'flex', gap: '1.5rem', margin: '2rem 0 1rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-          <button 
-            onClick={() => setActiveTab('description')}
-            style={{ fontWeight: 'bold', background: 'none', border: 'none', color: activeTab === 'description' ? '#fff' : '#8b949e', borderBottom: activeTab === 'description' ? '2px solid #8b5cf6' : '2px solid transparent', cursor: 'pointer', paddingBottom: '0.8rem' }}
-          >
-            Description
-          </button>
-          <button 
-            onClick={() => setActiveTab('submissions')}
-            style={{ fontWeight: 'bold', background: 'none', border: 'none', color: activeTab === 'submissions' ? '#fff' : '#8b949e', borderBottom: activeTab === 'submissions' ? '2px solid #8b5cf6' : '2px solid transparent', cursor: 'pointer', paddingBottom: '0.8rem' }}
-          >
-            Submissions
-          </button>
+          <button onClick={() => setActiveTab('description')} style={tabStyle('description')}>Description</button>
+          <button onClick={() => setActiveTab('submissions')} style={tabStyle('submissions')}>Submissions</button>
         </div>
 
         {activeTab === 'description' ? (
@@ -118,7 +109,7 @@ function ProblemDetailPage() {
             </div>
 
             <div className="content-section" style={{ marginTop: '2rem' }}>
-              <h2>Examples & Test Cases</h2>
+              <h2>Examples &amp; Test Cases</h2>
               <TestCasesPanel examples={problem.examples} />
             </div>
 
@@ -138,16 +129,14 @@ function ProblemDetailPage() {
                 Please <Link to="/login" style={{ color: '#a78bfa', textDecoration: 'underline' }}>sign in</Link> to save and view submissions.
               </div>
             ) : (
-              <SubmissionsPanel 
-                submissions={submissions}
-              />
+              <SubmissionsPanel submissions={submissions} />
             )}
           </div>
         )}
       </div>
 
       <div className="sidebar-stack">
-        <CodePanel 
+        <CodePanel
           starterCodeMap={problem.starterCode}
           onSubmit={(code, language) => handleCodeExecute(code, language, false)}
           onRun={(code, language) => handleCodeExecute(code, language, true)}
