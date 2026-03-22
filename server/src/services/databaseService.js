@@ -24,7 +24,8 @@ export async function getAllProblems() {
     topics: JSON.parse(p.topics || '[]'),
     constraints: JSON.parse(p.constraints || '[]'),
     examples: JSON.parse(p.examples || '[]'),
-    starterCode: JSON.parse(p.starterCode || '{}')
+    starterCode: JSON.parse(p.starterCode || '{}'),
+    hints: JSON.parse(p.hints || '[]')
   }));
 }
 
@@ -37,7 +38,8 @@ export async function getProblemBySlug(slug) {
     topics: JSON.parse(problem.topics || '[]'),
     constraints: JSON.parse(problem.constraints || '[]'),
     examples: JSON.parse(problem.examples || '[]'),
-    starterCode: JSON.parse(problem.starterCode || '{}')
+    starterCode: JSON.parse(problem.starterCode || '{}'),
+    hints: JSON.parse(problem.hints || '[]')
   };
 }
 
@@ -46,17 +48,18 @@ export async function getProblemTestWrapper(slug) {
 }
 
 export async function createProblem(problemData, testWrapperData) {
-  const { slug, title, difficulty, summary, description, acceptanceRate, topics, constraints, examples, starterCode } = problemData;
+  const { slug, title, difficulty, summary, description, acceptanceRate, topics, constraints, examples, starterCode, hints } = problemData;
   const { test_wrappers } = testWrapperData;
 
   await dbRun(
     `INSERT OR REPLACE INTO problems 
-    (slug, title, difficulty, summary, description, acceptanceRate, topics, constraints, examples, starterCode)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    (slug, title, difficulty, summary, description, acceptanceRate, topics, constraints, examples, starterCode, hints)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       slug, title, difficulty, summary, description, acceptanceRate,
       JSON.stringify(topics), JSON.stringify(constraints), 
-      JSON.stringify(examples), JSON.stringify(starterCode)
+      JSON.stringify(examples), JSON.stringify(starterCode),
+      JSON.stringify(hints || [])
     ]
   );
   

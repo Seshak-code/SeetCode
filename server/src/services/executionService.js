@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const execAsync = promisify(exec);
 
-export async function executeCodeInDocker(code, language, slug, isRunMode = false) {
+export async function executeCodeInDocker(code, language, slug, isRunMode = false, firmwareCode = null) {
   const runId = uuidv4();
   // Using a local folder because Docker Desktop file sharing works flawlessly with subfolders of the current project
   const projectTmpDir = path.join(process.cwd(), 'docker_tmp', `seetcode-${runId}`);
@@ -32,9 +32,14 @@ export async function executeCodeInDocker(code, language, slug, isRunMode = fals
     const limitArg = isRunMode ? ' 3' : '';
     
     if (language === 'cpp') {
+        // If a firmware HAL is provided, write it as firmware.h (included by solution.h)
+        if (firmwareCode) {
+          await fs.writeFile(path.join(projectTmpDir, 'firmware.h'), firmwareCode);
+        }
         await fs.writeFile(path.join(projectTmpDir, 'solution.h'), code);
         await fs.writeFile(path.join(projectTmpDir, 'main.cpp'), wrapperCode);
         dockerCmd = `docker run --rm -v "${projectTmpDir}:/usr/src/app" -w /usr/src/app gcc:latest bash -c "g++ -O3 main.cpp -o main && timeout 10s ./main${limitArg}"`;
+
     } else if (language === 'javascript') {
         await fs.writeFile(path.join(projectTmpDir, 'solution.js'), code);
         await fs.writeFile(path.join(projectTmpDir, 'main.js'), wrapperCode);
@@ -66,19 +71,36 @@ export async function executeCodeInDocker(code, language, slug, isRunMode = fals
        if (cleanLine === '---TEST_RESULTS_END---') { inTestResults = false; continue; }
        
        if (inTestResults) {
-           const parts = cleanLine.split('|');
            const formatField = (str) => str ? str.replace(/<br>/g, '\n') : '';
+           const parts = cleanLine.split('|');
            
-           if (parts.length >= 5) {
-               testDetails.push({ 
-                 id: parts[0], 
-                 status: parts[1], 
-                 input: formatField(parts[2]), 
-                 output: formatField(parts[3]), 
-                 expected: formatField(parts[4]) 
+           // Extract GRID/visual payload robustly regardless of PASS/FAIL position
+           const gridIndex = parts.findIndex(p => p.startsWith('GRID:'));
+           const visualData = gridIndex >= 0 ? parts[gridIndex] : '';
+           
+           // The display parts (input, output) shouldn't contain the raw GRID string
+           const displayParts = parts.filter((_, idx) => idx !== gridIndex && parts[idx] !== '[visual]' && parts[idx] !== '[error]');
+           
+           const isPass = parts[1] === 'PASS';
+           
+           if (displayParts.length >= 4) {
+               testDetails.push({
+                 id: displayParts[0],
+                 status: displayParts[1],
+                 pass: isPass,
+                 input: formatField(displayParts[2]),
+                 output: formatField(displayParts[3]),
+                 expected: displayParts.length >= 5 ? formatField(displayParts[4]) : '',
+                 visualData: visualData
                });
-           } else if (parts.length >= 3) {
-               testDetails.push({ id: parts[0], status: parts[1], message: formatField(parts.slice(2).join('|')) });
+           } else if (displayParts.length >= 3) {
+               testDetails.push({ 
+                 id: displayParts[0], 
+                 status: displayParts[1], 
+                 pass: isPass,
+                 message: formatField(displayParts.slice(2).join('|')),
+                 visualData: visualData
+               });
            }
        } else if (cleanLine.startsWith('SUMMARY|')) {
            const parts = cleanLine.split('|');
@@ -93,6 +115,8 @@ export async function executeCodeInDocker(code, language, slug, isRunMode = fals
     
     // Algorithmic Optimizer Heuristics
     let feedback = [];
+    let hints = [];
+
     if (slug === 'two-sum') {
        const forLoops = code.match(/for\s*\(/g) || [];
        
@@ -149,6 +173,11 @@ export async function executeCodeInDocker(code, language, slug, isRunMode = fals
        }
     }
     
+    // Generic hints for failures
+    if (!isSuccess && feedback.length === 0 && hints.length === 0) {
+       hints.push('Try printing the robot state at each step to see where it deviates from the expected path.');
+    }
+    
     return {
       status: isSuccess ? 'Accepted' : 'Failed',
       isRunMode,
@@ -158,12 +187,14 @@ export async function executeCodeInDocker(code, language, slug, isRunMode = fals
       passed,
       total,
       testDetails,
-      feedback
+      feedback,
+      hints
     };
     
   } catch (error) {
     const errorLog = error.stderr || error.message || '';
     let feedback = [];
+    let hints = [];
     let statusLabel = 'Compilation Error or Timeout';
     
     // Detect timeout (exit code 124 from Linux `timeout` utility)
@@ -197,7 +228,8 @@ export async function executeCodeInDocker(code, language, slug, isRunMode = fals
       passed: 0,
       total: 0,
       testDetails: [],
-      feedback: feedback
+      feedback: feedback,
+      hints: hints
     };
   } finally {
     // Cleanup temporary files

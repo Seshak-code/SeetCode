@@ -38,7 +38,12 @@ const matrix01Data = {
   "starterCode": {
     "cpp": "#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<vector<int>> updateMatrix(vector<vector<int>>& mat) {\n        \n    }\n};",
     "javascript": "function updateMatrix(mat) {\n  \n}"
-  }
+  },
+  "hints": [
+    "Multi-source BFS: Start your search from all cells containing '0' simultaneously. This ensures you find the shortest path to a 0 for every '1' in a single pass.",
+    "Distance Tracking: Use a distance matrix initialized with a large value (INF) for '1's and 0 for '0's. Update distances as you discover new cells in BFS.",
+    "Optimization: What is the time complexity of running BFS from each '1' individually vs starting from all '0's?"
+  ]
 };
 
 const matrix01CppTemplate = `#include <iostream>
@@ -203,7 +208,12 @@ const rottingOrangesData = {
   "starterCode": {
     "cpp": "#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    int orangesRotting(vector<vector<int>>& grid) {\n        \n    }\n};",
     "javascript": "function orangesRotting(grid) {\n  \n}"
-  }
+  },
+  "hints": [
+    "Breadth-First Search (BFS): This is a classic shortest path/level-order traversal problem on a grid. Every minute represents one level of BFS.",
+    "Initial State: Seed your queue with all initially rotten oranges (2). Also, keep a count of all fresh oranges (1).",
+    "Termination: The process stops when the queue is empty. If the count of fresh oranges is not zero at the end, return -1."
+  ]
 };
 
 const rottingOrangesCppTemplate = `#include <iostream>
@@ -381,7 +391,12 @@ const floodFillData = {
   "starterCode": {
     "cpp": "#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<vector<int>> floodFill(vector<vector<int>>& image, int sr, int sc, int color) {\n        \n    }\n};",
     "javascript": "function floodFill(image, sr, sc, color) {\n  \n}"
-  }
+  },
+  "hints": [
+    "Traversal Selection: You can use either DFS (Recursion) or BFS (Queue) to solve this. Which one feels more natural for 'filling' an area?",
+    "Avoid Infinite Loops: If the starting pixel already has the target color, no change is needed. If you proceed, you might end up in an infinite recursion!",
+    "Conditionals: Only fill adjacent pixels that have the exact same starting color as the initial pixel `image[sr][sc]`."
+  ]
 };
 
 const floodFillCppTemplate = `#include <iostream>
@@ -545,7 +560,12 @@ const maxAreaOfIslandData = {
   "starterCode": {
     "cpp": "#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    int maxAreaOfIsland(vector<vector<int>>& grid) {\n        \n    }\n};",
     "javascript": "function maxAreaOfIsland(grid) {\n  \n}"
-  }
+  },
+  "hints": [
+    "Global Maximum: Traverse every cell in the grid. If you find a '1', start a DFS/BFS to calculate the area of that island, then update your global maximum.",
+    "Avoid Re-visiting: To prevent counting the same land twice, either use a `visited` set or 'sink' the island by setting visited land to '0' during your traversal.",
+    "Recursive Area: How can you structure your DFS so it returns the sum of land cells it successfully visits?"
+  ]
 };
 
 const maxAreaOfIslandCppTemplate = `#include <iostream>
@@ -709,7 +729,12 @@ const numberOfIslandsData = {
   "starterCode": {
     "cpp": "#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    int numIslands(vector<vector<char>>& grid) {\n        \n    }\n};",
     "javascript": "function numIslands(grid) {\n  \n}"
-  }
+  },
+  "hints": [
+    "Island Counting: Every time you encounter a '1' during your grid traversal that hasn't been visited yet, you've found a new island. Increment your counter and visit all connected land cells.",
+    "Sinking Islands: A common optimization is to mark visited land ('1') as water ('0') directly in the grid to avoid using extra space for a `visited` matrix.",
+    "Traversal choice: Both BFS and DFS work perfectly here. Which one is easier to implement without hitting stack limits on very large grids?"
+  ]
 };
 
 const numberOfIslandsCppTemplate = `#include <iostream>

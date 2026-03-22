@@ -33,15 +33,16 @@ export async function getProblemBySlug(request, response) {
 export async function submitProblem(request, response) {
   try {
     const { slug } = request.params;
-    const { code, language, isRunMode, userId } = request.body;
+    const { code, language, isRunMode, userId, firmwareCode } = request.body;
 
-    const result = await executeCodeInDocker(code, language, slug, isRunMode);
+    const result = await executeCodeInDocker(code, language, slug, isRunMode, firmwareCode || null);
 
     if (!isRunMode && userId) {
       await createSubmission(userId, slug, language, code, result.status, result.executionTimeMs, result.feedback);
     }
 
     return response.json(result);
+
   } catch (error) {
     console.error(error);
     return response.status(500).json({ error: 'Execution failed' });

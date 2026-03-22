@@ -5,9 +5,9 @@ function ExecutionResultsPanel({ result, isSubmitting }) {
   const [selectedCase, setSelectedCase] = useState(0);
   if (isSubmitting) {
     return (
-      <section className="panel results-panel" style={{ flexGrow: 1, minHeight: '300px' }}>
-        <div className="panel__header">
-          <h2>Execution Results</h2>
+      <section className="panel results-panel" style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+        <div className="panel__header" style={{ padding: '0.8rem 1.2rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <h2 style={{ fontSize: '1.1rem', margin: 0 }}>Execution Results</h2>
         </div>
         <div className="results-content" style={{ padding: '40px 20px', textAlign: 'center', color: '#8b949e' }}>
           <div style={{ display: 'inline-block', width: '24px', height: '24px', border: '3px solid #3b3b3b', borderTopColor: '#58a6ff', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: '15px' }}></div>
@@ -26,9 +26,9 @@ function ExecutionResultsPanel({ result, isSubmitting }) {
   const statusColor = isSuccess ? '#2ea44f' : '#cb2431';
 
   return (
-    <section className="panel results-panel" style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minHeight: '300px' }}>
-      <div className="panel__header">
-        <h2>Test Result</h2>
+    <section className="panel results-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
+      <div className="panel__header" style={{ padding: '0.8rem 1.2rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <h2 style={{ fontSize: '1.1rem', margin: 0 }}>Test Result</h2>
       </div>
       <div className="results-content" style={{ padding: '15px', display: 'flex', flexDirection: 'column', gap: '20px', overflowY: 'auto' }}>
         <div style={{ paddingBottom: '10px', borderBottom: '1px solid #30363d' }}>
@@ -132,6 +132,19 @@ function ExecutionResultsPanel({ result, isSubmitting }) {
             <ul style={{ margin: 0, paddingLeft: '20px', lineHeight: '1.6', color: '#c9d1d9' }}>
               {result.feedback.map((fb, i) => (
                 <li key={i}>{fb}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {result.hints && result.hints.length > 0 && (
+          <div className="hints-section" style={{ background: 'rgba(255, 191, 0, 0.05)', padding: '15px', borderRadius: '8px', borderLeft: '4px solid #ffbf00', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+            <h4 style={{ margin: '0 0 10px 0', color: '#ffbf00', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.1rem' }}>
+              ⭐ Useful Hints
+            </h4>
+            <ul style={{ margin: 0, paddingLeft: '20px', lineHeight: '1.6', color: '#c9d1d9' }}>
+              {result.hints.map((hint, i) => (
+                <li key={i}>{hint}</li>
               ))}
             </ul>
           </div>

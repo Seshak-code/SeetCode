@@ -74,7 +74,8 @@ async function init() {
       topics TEXT,
       constraints TEXT,
       examples TEXT,
-      starterCode TEXT
+      starterCode TEXT,
+      hints TEXT
     )
   `);
 
@@ -134,7 +135,12 @@ You can return the answer in any order.
     starterCode: {
       cpp: `#include <vector>\n#include <unordered_map>\nusing namespace std;\n\nclass Solution {\npublic:\n    vector<int> twoSum(vector<int>& nums, int target) {\n        \n    }\n};`,
       javascript: `function twoSum(nums, target) {\n  \n}`
-    }
+    },
+    hints: [
+      "Brute Force: Try checking every pair of numbers using nested loops. What is the time complexity of this approach?",
+      "Optimization: Can you use a Hash Map (unordered_map in C++) to store numbers and their indices as you traverse the array?",
+      "Complement Search: For each number 'x', the target is 'target - x'. Check if this complement already exists in your map."
+    ]
   };
 
   const mainCppTemplate = `
@@ -389,7 +395,12 @@ You are given an <code>m x n</code> grid initialized with three possible values:
     starterCode: {
       cpp: `#include <vector>\n#include <queue>\nusing namespace std;\n\nclass Solution {\npublic:\n    void wallsAndGates(vector<vector<int>>& rooms) {\n        \n    }\n};`,
       javascript: `function wallsAndGates(rooms) {\n  \n}`
-    }
+    },
+    hints: [
+      "Multiple Sources: Instead of running BFS from each empty room, start a single BFS from all Gates (0s) at once.",
+      "In-place Updates: Update the distance of an empty room (INF) as soon as you discover it in the BFS. This prevents adding the same cell to the queue multiple times.",
+      "Cell Identification: Gates are 0, Walls are -1, and Empty Rooms are 2147483647. Avoid processing Walls!"
+    ]
   };
 
   await createProblem(twoSumData, { test_wrappers: { cpp: mainCppTemplate } });
