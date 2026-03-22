@@ -1,16 +1,12 @@
 # 🚀 SeetCode: The Ultimate Sandbox for Aspiring Devs
 
-Welcome to **SeetCode**, a sleek, high-performance LeetCode clone designed for developers who want to master algorithms without the clutter. Built with a modern **JavaScript** stack, SeetCode focuses on speed, reliability, and a premium user experience.
+Welcome to **SeetCode**, a LeetCode clone designed for me and my friends who want to master algorithms without dealing with paywalls. Built with a modern **JavaScript** stack, SeetCode focuses on expanding on LeetCode problems with more realistic hardware & robotics focus, with a similar UI.
 
-Whether you're practicing for interviews or building the next big thing, SeetCode provides a robust environment to write, test, and optimize your code.
+## 🛠 SeetCode Architecture
 
-## 🛠 The Engine Room
-
-SeetCode isn't just a pretty face; it's powered by a sophisticated architecture:
-
-- **Frontend:** A blazing-fast **React** application featuring a responsive layout and dynamic code editing.
-- **Sandboxing:** Secure code execution powered by **Docker**, ensuring your environment is isolated and consistent across languages.
-- **Database:** Lightweight and efficient **SQLite** for lightning-fast data retrieval and storage.
+- **Frontend:** **React** application featuring a modern layout and simple interface.
+- **Sandboxing:** Secure code execution powered by **Docker**, ensuring your coding environment is isolated and consistent across languages.
+- **Database:** Uses **SQLite** for data retrieval and storage.
 - **Graphics Engine:** Integrated **JavaScript Sandbox** for real-time problem visualizations (e.g., Robot Grid Tracker).
 
 ## 📁 Project Layout
@@ -60,16 +56,11 @@ If you want friends to access your site without a VPN:
 
 ## ✨ Current Capabilities
 
-- ✅ **Monaco Editor:** A premium, VS Code-like editing experience with syntax highlighting.
+- ✅ **Monaco Editor:** A VS Code-like editing experience with syntax highlighting.
 - ✅ **Robot Grid Visualizations:** Real-time animation of robot firmware logic.
 - ✅ **Hardware Firmware HAL:** A dual-tab C++ environment for embedded systems simulation.
 - ✅ **LiDAR Integration:** Algorithmic sensor simulation for obstacle avoidance challenges.
-- ✅ **Algorithmic Optimizer:** Built-in heuristics for O(N) time and space complexity analysis.
+- ✅ **Algorithmic Optimizer:** Built-in heuristics for time and space complexity analysis.
 - ✅ **Automated Judging:** Secure Docker-powered pipeline for multi-language execution.
 
----
-*Built with ❤️ by developers, for developers.*
-
----
-*Built with ❤️ by developers, for developers.*
 
